@@ -1878,6 +1878,21 @@
             
             alert(message);
         }
+
+        // 店舗名入力時の処理
+        function handleProjectNameChange() {
+            const projectName = document.getElementById('projectName').value.trim();
+            if (projectName && savedFormData[projectName] && projectName !== currentProjectName) {
+                setTimeout(() => {
+                    if (loadSavedData(projectName)) {
+                        console.log(`${projectName}のデータを復元しました`);
+                    }
+                }, 100);
+            } else if (projectName) {
+                currentProjectName = projectName;
+                autoSave(); // 新しいプロジェクト名での保存を開始
+            }
+        }
     </script>
 </body>
 
