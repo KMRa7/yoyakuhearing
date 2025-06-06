@@ -860,7 +860,7 @@
     </div>
 
     <script>
-let menuCount = 0;
+        let menuCount = 0;
         let optionCounters = {};
         let suboptionCounters = {};
 
@@ -907,7 +907,6 @@ let menuCount = 0;
             `;
 
             container.appendChild(menuDiv);
-            autoSave(); // 自動保存を追加
         }
 
         function removeMenu(menuId) {
@@ -916,7 +915,6 @@ let menuCount = 0;
                 menuElement.remove();
                 delete optionCounters[menuId];
                 delete suboptionCounters[menuId];
-                autoSave(); // 自動保存を追加
             }
         }
 
@@ -945,7 +943,6 @@ let menuCount = 0;
             `;
 
             container.appendChild(optionDiv);
-            autoSave(); // 自動保存を追加
         }
 
         function removeOption(menuId, optionId) {
@@ -953,7 +950,6 @@ let menuCount = 0;
             if (optionElement) {
                 optionElement.remove();
                 updateItemNumbers(menuId, 'options');
-                autoSave(); // 自動保存を追加
             }
         }
 
@@ -982,7 +978,6 @@ let menuCount = 0;
             `;
 
             container.appendChild(suboptionDiv);
-            autoSave(); // 自動保存を追加
         }
 
         function removeSuboption(menuId, suboptionId) {
@@ -990,7 +985,6 @@ let menuCount = 0;
             if (suboptionElement) {
                 suboptionElement.remove();
                 updateItemNumbers(menuId, 'suboptions');
-                autoSave(); // 自動保存を追加
             }
         }
 
@@ -1021,7 +1015,6 @@ let menuCount = 0;
                 startInput.style.backgroundColor = '';
                 endInput.style.backgroundColor = '';
             }
-            autoSave(); // 自動保存を追加
         }
 
         function getRadioValue(name) {
@@ -1086,11 +1079,7 @@ let menuCount = 0;
                     reservelastover: getRadioValue('reservelastover'),
                     overview: document.getElementById('overview').value
                 },
-                menus: [],
-                // 内部状態も保存
-                menuCount: menuCount,
-                optionCounters: optionCounters,
-                suboptionCounters: suboptionCounters
+                menus: []
             };
 
             for (let menuId = 1; menuId <= menuCount; menuId++) {
@@ -1099,6 +1088,8 @@ let menuCount = 0;
 
                 const menuInput = menuElement.querySelector(`input[name="menu-${menuId}"]`);
                 const menuName = menuInput ? menuInput.value : '';
+
+                if (!menuName) continue;
 
                 const menuData = {
                     id: menuId,
@@ -1549,23 +1540,32 @@ let menuCount = 0;
         // URLベースの永続化システム
         function saveToURL() {
             try {
+                // まずlocalStorageに保存（確実に保存）
+                localStorage.setItem('hearingSheetData', JSON.stringify(savedFormData));
+                
                 if (Object.keys(savedFormData).length === 0) {
-                    // データが空の場合はハッシュを削除
                     window.history.replaceState(null, '', window.location.pathname + window.location.search);
                     return;
                 }
                 
+                // URLにも保存を試行（データサイズが大きい場合は失敗する可能性がある）
                 const dataString = JSON.stringify(savedFormData);
                 const compressed = btoa(encodeURIComponent(dataString));
+                
+                // URL長制限チェック（一般的に2048文字以下）
                 const newUrl = window.location.pathname + window.location.search + '#data=' + compressed;
-                window.history.replaceState(null, '', newUrl);
-                console.log('URLに保存完了');
+                if (newUrl.length < 2000) {
+                    window.history.replaceState(null, '', newUrl);
+                    console.log('URLとlocalStorageに保存完了');
+                } else {
+                    console.log('URLが長すぎるため、localStorageのみに保存');
+                }
             } catch (e) {
-                console.error('URL保存エラー:', e);
-                // フォールバックとしてlocalStorageを使用
+                console.error('保存エラー:', e);
+                // 最低限localStorageには保存
                 try {
                     localStorage.setItem('hearingSheetData', JSON.stringify(savedFormData));
-                    console.log('localStorageにフォールバック保存');
+                    console.log('localStorageに保存完了');
                 } catch (localError) {
                     console.error('localStorage保存も失敗:', localError);
                 }
@@ -1573,31 +1573,39 @@ let menuCount = 0;
         }
 
         function loadFromURL() {
+            let urlData = null;
+            let localData = null;
+            
+            // URLからデータを取得
             try {
                 const hash = window.location.hash;
                 if (hash.startsWith('#data=')) {
                     const compressed = hash.substring(6);
-                    const decompressed = JSON.parse(decodeURIComponent(atob(compressed)));
-                    savedFormData = decompressed;
-                    console.log('URLからデータを復元しました');
-                    return true;
+                    urlData = JSON.parse(decodeURIComponent(atob(compressed)));
                 }
             } catch (e) {
                 console.error('URL復元エラー:', e);
             }
             
-            // URLからの復元に失敗した場合、localStorageを試す
+            // localStorageからデータを取得
             try {
                 const storedData = localStorage.getItem('hearingSheetData');
                 if (storedData) {
-                    savedFormData = JSON.parse(storedData);
-                    console.log('localStorageからデータを復元しました');
-                    // URLにも保存し直す
-                    saveToURL();
-                    return true;
+                    localData = JSON.parse(storedData);
                 }
             } catch (e) {
                 console.error('localStorage復元エラー:', e);
+            }
+            
+            // より新しいデータまたはより多くのデータを使用
+            if (localData && Object.keys(localData).length > 0) {
+                savedFormData = localData;
+                console.log('localStorageからデータを復元しました');
+                return true;
+            } else if (urlData && Object.keys(urlData).length > 0) {
+                savedFormData = urlData;
+                console.log('URLからデータを復元しました');
+                return true;
             }
             
             return false;
@@ -1609,10 +1617,13 @@ let menuCount = 0;
             if (projectName) {
                 try {
                     const data = collectFormData();
-                    savedFormData[projectName] = JSON.parse(JSON.stringify(data));
-                    currentProjectName = projectName;
-                    saveToURL();
-                    console.log(`自動保存完了: ${projectName}`);
+                    // データが有効かチェック
+                    if (data && data.basicInfo) {
+                        savedFormData[projectName] = JSON.parse(JSON.stringify(data));
+                        currentProjectName = projectName;
+                        saveToURL();
+                        console.log(`自動保存完了: ${projectName}`);
+                    }
                 } catch (e) {
                     console.error('自動保存エラー:', e);
                 }
@@ -1730,22 +1741,36 @@ let menuCount = 0;
 
         // ページ読み込み時の初期化
         document.addEventListener('DOMContentLoaded', function () {
-            // URLからデータを復元
-            loadFromURL();
+            // データ復元
+            const hasData = loadFromURL();
             
-            // デフォルトでカテゴリーを1つ追加
-            addMenu();
+            // 復元したデータがある場合の処理
+            if (hasData && Object.keys(savedFormData).length > 0) {
+                // 最後に編集していたプロジェクトを検出
+                const projectNames = Object.keys(savedFormData);
+                if (projectNames.length > 0) {
+                    // 一番最初のプロジェクトを復元（改善の余地あり）
+                    const firstProject = projectNames[0];
+                    document.getElementById('projectName').value = firstProject;
+                    setTimeout(() => {
+                        loadSavedData(firstProject);
+                    }, 100);
+                }
+            } else {
+                // データがない場合はデフォルトでカテゴリーを1つ追加
+                addMenu();
+            }
             
-            // 店舗名フィールドにイベントリスナー追加
+            // イベントリスナー設定
             const projectNameInput = document.getElementById('projectName');
             if (projectNameInput) {
                 projectNameInput.addEventListener('blur', handleProjectNameChange);
                 projectNameInput.addEventListener('change', handleProjectNameChange);
             }
             
-            // 全入力フィールドに自動保存イベント追加
-            document.addEventListener('input', debounce(autoSave, 1000));
-            document.addEventListener('change', autoSave);
+            // 自動保存設定（頻度を下げる）
+            document.addEventListener('input', debounce(autoSave, 2000));
+            document.addEventListener('change', debounce(autoSave, 500));
             
             // ページ離脱前に保存
             window.addEventListener('beforeunload', function() {
@@ -1823,8 +1848,19 @@ let menuCount = 0;
                 alert('店舗名を入力してください');
                 return;
             }
-            autoSave();
-            showCopyMessage('手動保存完了！');
+            
+            try {
+                autoSave();
+                // 保存確認
+                if (savedFormData[projectName]) {
+                    showCopyMessage(`${projectName} の手動保存完了！`);
+                } else {
+                    showCopyMessage('保存に失敗しました');
+                }
+            } catch (e) {
+                console.error('手動保存エラー:', e);
+                showCopyMessage('保存エラーが発生しました');
+            }
         }
 
         function showProjectList() {
