@@ -1742,24 +1742,10 @@
         // ページ読み込み時の初期化
         document.addEventListener('DOMContentLoaded', function () {
             // データ復元
-            const hasData = loadFromURL();
+            loadFromURL();
             
-            // 復元したデータがある場合の処理
-            if (hasData && Object.keys(savedFormData).length > 0) {
-                // 最後に編集していたプロジェクトを検出
-                const projectNames = Object.keys(savedFormData);
-                if (projectNames.length > 0) {
-                    // 一番最初のプロジェクトを復元（改善の余地あり）
-                    const firstProject = projectNames[0];
-                    document.getElementById('projectName').value = firstProject;
-                    setTimeout(() => {
-                        loadSavedData(firstProject);
-                    }, 100);
-                }
-            } else {
-                // データがない場合はデフォルトでカテゴリーを1つ追加
-                addMenu();
-            }
+            // データの有無に関わらず、デフォルトでカテゴリーを1つ追加
+            addMenu();
             
             // イベントリスナー設定
             const projectNameInput = document.getElementById('projectName');
