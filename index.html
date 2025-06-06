@@ -1671,7 +1671,14 @@
                     if (radio) radio.checked = true;
                 } else {
                     const element = document.getElementById(key);
-                    if (element) element.value = basic[key] || '';
+                    if (element) {
+                        // projectNameの場合は復元できない名前なら空白にする
+                        if (key === 'projectName' && basic[key] && !savedFormData[basic[key]]) {
+                            element.value = '';
+                        } else {
+                            element.value = basic[key] || '';
+                        }
+                    }
                 }
             });
 
