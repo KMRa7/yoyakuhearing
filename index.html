@@ -860,7 +860,7 @@
     </div>
 
     <script>
-        let menuCount = 0;
+let menuCount = 0;
         let optionCounters = {};
         let suboptionCounters = {};
 
@@ -907,6 +907,7 @@
             `;
 
             container.appendChild(menuDiv);
+            autoSave(); // 自動保存を追加
         }
 
         function removeMenu(menuId) {
@@ -915,6 +916,7 @@
                 menuElement.remove();
                 delete optionCounters[menuId];
                 delete suboptionCounters[menuId];
+                autoSave(); // 自動保存を追加
             }
         }
 
@@ -943,6 +945,7 @@
             `;
 
             container.appendChild(optionDiv);
+            autoSave(); // 自動保存を追加
         }
 
         function removeOption(menuId, optionId) {
@@ -950,6 +953,7 @@
             if (optionElement) {
                 optionElement.remove();
                 updateItemNumbers(menuId, 'options');
+                autoSave(); // 自動保存を追加
             }
         }
 
@@ -978,6 +982,7 @@
             `;
 
             container.appendChild(suboptionDiv);
+            autoSave(); // 自動保存を追加
         }
 
         function removeSuboption(menuId, suboptionId) {
@@ -985,6 +990,7 @@
             if (suboptionElement) {
                 suboptionElement.remove();
                 updateItemNumbers(menuId, 'suboptions');
+                autoSave(); // 自動保存を追加
             }
         }
 
@@ -1015,6 +1021,7 @@
                 startInput.style.backgroundColor = '';
                 endInput.style.backgroundColor = '';
             }
+            autoSave(); // 自動保存を追加
         }
 
         function getRadioValue(name) {
@@ -1079,7 +1086,11 @@
                     reservelastover: getRadioValue('reservelastover'),
                     overview: document.getElementById('overview').value
                 },
-                menus: []
+                menus: [],
+                // 内部状態も保存
+                menuCount: menuCount,
+                optionCounters: optionCounters,
+                suboptionCounters: suboptionCounters
             };
 
             for (let menuId = 1; menuId <= menuCount; menuId++) {
@@ -1088,8 +1099,6 @@
 
                 const menuInput = menuElement.querySelector(`input[name="menu-${menuId}"]`);
                 const menuName = menuInput ? menuInput.value : '';
-
-                if (!menuName) continue;
 
                 const menuData = {
                     id: menuId,
