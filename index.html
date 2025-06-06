@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>階層型ヒアリングシート作成フォーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 25px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px 40px;
+        }
+
+        .left-column,
+        .right-column {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* 営業時間セクション */
+        .business-hours {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .day-group {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .day-title {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .time-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .time-input-wrapper {
+            flex: 1;
+        }
+
+        .time-input-label {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .time-input {
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        .time-separator {
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .closed-checkbox-container {
+            margin-top: 8px;
+        }
+
+        .closed-checkbox-label {
+            font-size: 0.85em;
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .closed-checkbox {
+            width: auto;
+            margin: 0;
+        }
+
+        .input-hint {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 10px;
+            padding: 8px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+
+        /* カテゴリーセクション */
+        .menu-section {
+            background: white;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .menu-section:hover {
+            border-color: #4CAF50;
+            background: #f0fff0;
+        }
+
+        .menu-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .menu-number {
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 0.9em;
+        }
+
+        .menu-input {
+            flex: 1;
+        }
+
+        .remove-menu-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-menu-btn:hover {
+            background: #ff3742;
+            transform: translateY(-1px);
+        }
+
+        /* 項目セクション */
+        .items-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .item-section {
+            background: #fafbfc;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .item-section h4 {
+            color: #495057;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .options-section h4::before {
+            content: "🔹";
+            color: #17a2b8;
+        }
+
+        .suboptions-section h4::before {
+            content: "🔸";
+            color: #28a745;
+        }
+
+        /* メニュー・オプション項目 */
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .item-number {
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option-item .item-number {
+            background: #17a2b8;
+        }
+
+        .suboption-item .item-number {
+            background: #28a745;
+        }
+
+        .item-input {
+            flex: 1;
+        }
+
+        .item-input input {
+            margin: 0;
+            background: transparent;
+            border: 1px solid #dee2e6;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        .remove-item-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .remove-item-btn:hover {
+            background: #c82333;
+        }
+
+        /* ボタンスタイル */
+        .add-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 8px 4px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+        }
+
+        .add-option-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            font-size: 12px;
+            padding: 6px 12px;
+            margin: 3px;
+        }
+
+        .add-suboption-btn {
+            background: linear-gradient(135deg, #28a745, #218838);
+            font-size: 12px;
+            padding: 6px 12px;
+            margin: 3px;
+        }
+
+        .add-option-btn:hover {
+            box-shadow: 0 6px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .add-suboption-btn:hover {
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* 共有機能のスタイル */
+        .share-section {
+            grid-column: 1 / -1;
+            background: white;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .share-title {
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .share-btn {
+            background: linear-gradient(135deg, #fd7e14, #e55a00);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(253, 126, 20, 0.3);
+        }
+
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .business-hours {
+                grid-template-columns: 1fr;
+            }
+
+            .items-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+            }
+
+            .main-layout {
+                padding: 20px;
+            }
+
+            .left-column,
+            .right-column {
+                padding: 20px;
+            }
+        }
+
+        .item-input {
+            flex: 1;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .item-input input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .item-input input[type="number"] {
+            padding: 8px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 予約システムヒアリングシート作成フォーム</h1>
+        </div>
+
+        <div class="main-layout">
+            <!-- 左列：基本設定 -->
+            <div class="left-column">
+                <div class="section-title">
+                    ⚙️ 基本設定
+                </div>
+
+                <form id="hearingForm">
+                    <div class="form-group">
+                        <label for="projectName">店舗名を入力してください</label>
+                        <input type="text" id="projectName" name="projectName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountName">Googleアカウント名を入力してください</label>
+                        <input type="text" id="accountName" name="accountName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Googleアカウントのパスワードを入力してください</label>
+                        <input type="text" id="password" name="password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shareUrl">共有URLを入力してください</label>
+                        <input type="text" id="shareUrl" name="shareUrl">
+                    </div>
+
+                    <div class="form-group">
+                        <label>お名前入力欄を設定しますか?</label>
+                        <div style="margin-top: 8px;">
+                            <label style="margin-right: 20px;">
+                                <input type="radio" name="name" value="yes" style="margin-right: 5px;">
+                                はい
+                            </label>
+                            <label>
+                                <input type="radio" name="name" value="no" style="margin-right: 5px;">
+                                いいえ
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>電話番号入力欄を設定しますか?</label>
+                        <div style="margin-top: 8px;">
+                            <label style="margin-right: 20px;">
+                                <input type="radio" name="tel" value="yes" style="margin-right: 5px;">
+                                はい
+                            </label>
+                            <label>
+                                <input type="radio" name="tel" value="no" style="margin-right: 5px;">
+                                いいえ
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>祝日は営業されますか？</label>
+                        <div style="margin-top: 8px;">
+                            <label style="margin-right: 20px;">
+                                <input type="radio" name="holiday" value="yes" style="margin-right: 5px;">
+                                はい
+                            </label>
+                            <label>
+                                <input type="radio" name="holiday" value="no" style="margin-right: 5px;">
+                                いいえ
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>複数選択したいですか？</label>
+                        <div style="margin-top: 8px;">
+                            <label style="margin-right: 20px;">
+                                <input type="radio" name="multiple" value="yes" style="margin-right: 5px;">
+                                はい
+                            </label>
+                            <label>
+                                <input type="radio" name="multiple" value="no" style="margin-right: 5px;">
+                                いいえ
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interval">予約間隔を入力してください</label>
+                        <input type="text" id="interval" name="interval" placeholder="例：30分">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frame">1コマの最大予約数を入力してください</label>
+                        <input type="text" id="frame" name="frame">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user">1ユーザーの最大予約数を入力してください</label>
+                        <input type="text" id="user" name="user">
+                    </div>
+
+                    <div class="form-group">
+                        <label>営業時間を入力してください</label>
+                        <div class="business-hours">
+                            <div class="day-group">
+                                <div class="day-title">日曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="sunday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="sunday_start" name="sunday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="sunday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="sunday_end" name="sunday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="sunday_closed" name="sunday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('sunday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">月曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="monday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="monday_start" name="monday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="monday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="monday_end" name="monday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="monday_closed" name="monday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('monday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">火曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="tuesday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="tuesday_start" name="tuesday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="tuesday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="tuesday_end" name="tuesday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="tuesday_closed" name="tuesday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('tuesday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">水曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="wednesday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="wednesday_start" name="wednesday_start"
+                                            placeholder="09:00" class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="wednesday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="wednesday_end" name="wednesday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="wednesday_closed" name="wednesday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('wednesday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">木曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="thursday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="thursday_start" name="thursday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="thursday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="thursday_end" name="thursday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="thursday_closed" name="thursday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('thursday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">金曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="friday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="friday_start" name="friday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="friday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="friday_end" name="friday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="friday_closed" name="friday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('friday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="day-group">
+                                <div class="day-title">土曜日</div>
+                                <div class="time-input-container">
+                                    <div class="time-input-wrapper">
+                                        <label for="saturday_start" class="time-input-label">開始時間</label>
+                                        <input type="text" id="saturday_start" name="saturday_start" placeholder="09:00"
+                                            class="time-input">
+                                    </div>
+                                    <span class="time-separator">〜</span>
+                                    <div class="time-input-wrapper">
+                                        <label for="saturday_end" class="time-input-label">終了時間</label>
+                                        <input type="text" id="saturday_end" name="saturday_end" placeholder="18:00"
+                                            class="time-input">
+                                    </div>
+                                </div>
+                                <div class="closed-checkbox-container">
+                                    <label class="closed-checkbox-label">
+                                        <input type="checkbox" id="saturday_closed" name="saturday_closed"
+                                            class="closed-checkbox" onchange="toggleDayInputs('saturday')">
+                                        定休日
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-hint">
+                            ※ 時間は「HH:MM」形式で入力してください（例：09:00、18:30）<br>
+                            定休日にチェックを入れると、その曜日の時間入力が無効になります。
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="multipletime">営業時間が複数ある場合備考を入力してください。ない場合入力は不要です</label>
+                        <input type="text" id="multipletime" name="multipletime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reservestart">予約受付開始時間を入力してください</label>
+                        <input type="text" id="reservestart" name="reservestart">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reservelast">予約最終受付時間を入力してください</label>
+                        <input type="text" id="reservelast" name="reservelast">
+                    </div>
+
+                    <div class="form-group">
+                        <label>最終予約受付時間超過してもよろしですか？</label>
+                        <div style="margin-top: 8px;">
+                            <label style="margin-right: 20px;">
+                                <input type="radio" name="reservelastover" value="yes" style="margin-right: 5px;">
+                                はい
+                            </label>
+                            <label>
+                                <input type="radio" name="reservelastover" value="no" style="margin-right: 5px;">
+                                いいえ
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="overview">備考・その他の設定</label>
+                        <textarea id="overview" name="overview" placeholder="その他の設定や備考を記入してください..."></textarea>
+                    </div>
+
+
+
+
+                </form>
+            </div>
+
+            <!-- 右列：カテゴリー設定 -->
+            <div class="right-column">
+                <div class="section-title">
+                    📝 カテゴリー設定
+                </div>
+
+                <div id="menusContainer"></div>
+
+                <button type="button" class="add-btn" onclick="addMenu()">
+                    ➕ カテゴリーを追加
+                </button>
+            </div>
+
+            <!-- 出力セクション -->
+            <div class="share-section">
+                <div class="share-title">
+                    📄 ヒアリングシートを出力
+                </div>
+                <button class="share-btn" onclick="exportAsHTML()">
+                    📄 HTMLで出力
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let menuCount = 0;
+        let optionCounters = {};
+        let suboptionCounters = {};
+
+        function addMenu() {
+            menuCount++;
+            optionCounters[menuCount] = 0;
+            suboptionCounters[menuCount] = 0;
+            const container = document.getElementById('menusContainer');
+
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'menu-section';
+            menuDiv.id = `menu-${menuCount}`;
+
+            menuDiv.innerHTML = `
+                <div class="menu-header">
+                    <div class="menu-number">${menuCount}</div>
+                    <div class="menu-input">
+                        <input type="text" name="menu-${menuCount}" placeholder="カテゴリー名を入力...">
+                    </div>
+                    <button type="button" class="remove-menu-btn" onclick="removeMenu(${menuCount})">削除</button>
+                </div>
+                
+                <div class="items-container">
+                    <div class="item-section options-section">
+                        <h4>メニュー項目</h4>
+                        <div id="options-${menuCount}" class="options-container"></div>
+                        <div class="button-group">
+                            <button type="button" class="add-option-btn" onclick="addOption(${menuCount})">
+                                ➕ メニュー追加
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="item-section suboptions-section">
+                        <h4>オプション項目</h4>
+                        <div id="suboptions-${menuCount}" class="suboptions-container"></div>
+                        <div class="button-group">
+                            <button type="button" class="add-suboption-btn" onclick="addSuboption(${menuCount})">
+                                ➕ オプション追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(menuDiv);
+        }
+
+        function removeMenu(menuId) {
+            const menuElement = document.getElementById(`menu-${menuId}`);
+            if (menuElement) {
+                menuElement.remove();
+                delete optionCounters[menuId];
+                delete suboptionCounters[menuId];
+            }
+        }
+
+        function addOption(menuId) {
+            if (!optionCounters[menuId]) optionCounters[menuId] = 0;
+            optionCounters[menuId]++;
+            const optionId = optionCounters[menuId];
+
+            const container = document.getElementById(`options-${menuId}`);
+
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'item option-item';
+            optionDiv.id = `option-${menuId}-${optionId}`;
+
+            optionDiv.innerHTML = `
+                <div class="item-number">${optionId}</div>
+                <div class="item-input" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                    <input type="text" name="option-${menuId}-${optionId}" placeholder="メニュー名を入力..." style="width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="font-size: 12px; color: #666; min-width: 40px;">所要時間:</label>
+                        <input type="number" name="option-time-${menuId}-${optionId}" placeholder="30" min="1" style="width: 80px;">
+                        <span style="font-size: 12px; color: #666;">分</span>
+                    </div>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="removeOption(${menuId}, ${optionId})">削除</button>
+            `;
+
+            container.appendChild(optionDiv);
+        }
+
+        function removeOption(menuId, optionId) {
+            const optionElement = document.getElementById(`option-${menuId}-${optionId}`);
+            if (optionElement) {
+                optionElement.remove();
+                updateItemNumbers(menuId, 'options');
+            }
+        }
+
+        function addSuboption(menuId) {
+            if (!suboptionCounters[menuId]) suboptionCounters[menuId] = 0;
+            suboptionCounters[menuId]++;
+            const suboptionId = suboptionCounters[menuId];
+
+            const container = document.getElementById(`suboptions-${menuId}`);
+
+            const suboptionDiv = document.createElement('div');
+            suboptionDiv.className = 'item suboption-item';
+            suboptionDiv.id = `suboption-${menuId}-${suboptionId}`;
+
+            suboptionDiv.innerHTML = `
+                <div class="item-number">${suboptionId}</div>
+                <div class="item-input" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                    <input type="text" name="suboption-${menuId}-${suboptionId}" placeholder="メニュー名を入力..." style="width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="font-size: 12px; color: #666; min-width: 40px;">所要時間:</label>
+                        <input type="number" name="suboption-time-${menuId}-${suboptionId}" placeholder="30" min="1" style="width: 80px;">
+                        <span style="font-size: 12px; color: #666;">分</span>
+                    </div>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="removeSuboption(${menuId}, ${suboptionId})">削除</button>
+            `;
+
+            container.appendChild(suboptionDiv);
+        }
+
+        function removeSuboption(menuId, suboptionId) {
+            const suboptionElement = document.getElementById(`suboption-${menuId}-${suboptionId}`);
+            if (suboptionElement) {
+                suboptionElement.remove();
+                updateItemNumbers(menuId, 'suboptions');
+            }
+        }
+
+        function updateItemNumbers(menuId, type) {
+            const container = document.getElementById(`${type}-${menuId}`);
+            const items = container.querySelectorAll('.item');
+            items.forEach((item, index) => {
+                const numberElement = item.querySelector('.item-number');
+                numberElement.textContent = index + 1;
+            });
+        }
+
+        function toggleDayInputs(day) {
+            const closedCheckbox = document.getElementById(`${day}_closed`);
+            const startInput = document.getElementById(`${day}_start`);
+            const endInput = document.getElementById(`${day}_end`);
+
+            if (closedCheckbox.checked) {
+                startInput.disabled = true;
+                endInput.disabled = true;
+                startInput.style.backgroundColor = '#f5f5f5';
+                endInput.style.backgroundColor = '#f5f5f5';
+                startInput.value = '';
+                endInput.value = '';
+            } else {
+                startInput.disabled = false;
+                endInput.disabled = false;
+                startInput.style.backgroundColor = '';
+                endInput.style.backgroundColor = '';
+            }
+        }
+
+        function getRadioValue(name) {
+            const radio = document.querySelector(`input[name="${name}"]:checked`);
+            return radio ? radio.value : '';
+        }
+
+        function collectFormData() {
+            const data = {
+                basicInfo: {
+                    projectName: document.getElementById('projectName').value,
+                    accountName: document.getElementById('accountName').value,
+                    password: document.getElementById('password').value,
+                    shareUrl: document.getElementById('shareUrl').value,
+                    name: getRadioValue('name'),
+                    tel: getRadioValue('tel'),
+                    holiday: getRadioValue('holiday'),
+                    multiple: getRadioValue('multiple'),
+                    interval: document.getElementById('interval').value,
+                    frame: document.getElementById('frame').value,
+                    user: document.getElementById('user').value,
+                    businessHours: {
+                        sunday: {
+                            start: document.getElementById('sunday_start').value,
+                            end: document.getElementById('sunday_end').value,
+                            closed: document.getElementById('sunday_closed').checked
+                        },
+                        monday: {
+                            start: document.getElementById('monday_start').value,
+                            end: document.getElementById('monday_end').value,
+                            closed: document.getElementById('monday_closed').checked
+                        },
+                        tuesday: {
+                            start: document.getElementById('tuesday_start').value,
+                            end: document.getElementById('tuesday_end').value,
+                            closed: document.getElementById('tuesday_closed').checked
+                        },
+                        wednesday: {
+                            start: document.getElementById('wednesday_start').value,
+                            end: document.getElementById('wednesday_end').value,
+                            closed: document.getElementById('wednesday_closed').checked
+                        },
+                        thursday: {
+                            start: document.getElementById('thursday_start').value,
+                            end: document.getElementById('thursday_end').value,
+                            closed: document.getElementById('thursday_closed').checked
+                        },
+                        friday: {
+                            start: document.getElementById('friday_start').value,
+                            end: document.getElementById('friday_end').value,
+                            closed: document.getElementById('friday_closed').checked
+                        },
+                        saturday: {
+                            start: document.getElementById('saturday_start').value,
+                            end: document.getElementById('saturday_end').value,
+                            closed: document.getElementById('saturday_closed').checked
+                        }
+                    },
+                    multipletime: document.getElementById('multipletime').value,
+                    reservestart: document.getElementById('reservestart').value,
+                    reservelast: document.getElementById('reservelast').value,
+                    reservelastover: getRadioValue('reservelastover'),
+                    overview: document.getElementById('overview').value
+                },
+                menus: []
+            };
+
+            for (let menuId = 1; menuId <= menuCount; menuId++) {
+                const menuElement = document.getElementById(`menu-${menuId}`);
+                if (!menuElement) continue;
+
+                const menuInput = menuElement.querySelector(`input[name="menu-${menuId}"]`);
+                const menuName = menuInput ? menuInput.value : '';
+
+                if (!menuName) continue;
+
+                const menuData = {
+                    id: menuId,
+                    name: menuName,
+                    options: [],
+                    suboptions: []
+                };
+
+                // メニュー収集
+                const optionsContainer = document.getElementById(`options-${menuId}`);
+                const optionInputs = optionsContainer ? optionsContainer.querySelectorAll('input[type="text"]') : [];
+
+                optionInputs.forEach(input => {
+                    if (input.value.trim() && input.name.includes('option-') && !input.name.includes('time')) {
+                        const optionId = input.name.split('-')[2];
+                        const timeInput = document.querySelector(`input[name="option-time-${menuId}-${optionId}"]`);
+                        menuData.options.push({
+                            name: input.value.trim(),
+                            time: timeInput ? parseInt(timeInput.value) || 0 : 0
+                        });
+                    }
+                });
+
+                // オプション収集
+                const suboptionsContainer = document.getElementById(`suboptions-${menuId}`);
+                const suboptionInputs = suboptionsContainer ? suboptionsContainer.querySelectorAll('input[type="text"]') : [];
+
+                suboptionInputs.forEach(input => {
+                    if (input.value.trim() && input.name.includes('suboption-') && !input.name.includes('time')) {
+                        const suboptionId = input.name.split('-')[2];
+                        const timeInput = document.querySelector(`input[name="suboption-time-${menuId}-${suboptionId}"]`);
+                        menuData.suboptions.push({
+                            name: input.value.trim(),
+                            time: timeInput ? parseInt(timeInput.value) || 0 : 0
+                        });
+                    }
+                });
+
+                data.menus.push(menuData);
+            }
+
+            return data;
+        }
+
+        function exportAsHTML() {
+            const data = collectFormData();
+
+            // HTMLテンプレートを生成
+            const htmlContent = generateHTMLContent(data);
+
+            // ファイル名を生成（プロジェクト名があればそれを使用）
+            const fileName = data.basicInfo.projectName
+                ? `${data.basicInfo.projectName}_ヒアリングシート.html`
+                : 'ヒアリングシート.html';
+
+            // ダウンロード実行
+            downloadHTML(htmlContent, fileName);
+        }
+
+        function generateBusinessHoursHTML(businessHours) {
+            const days = {
+                sunday: '日曜日',
+                monday: '月曜日',
+                tuesday: '火曜日',
+                wednesday: '水曜日',
+                thursday: '木曜日',
+                friday: '金曜日',
+                saturday: '土曜日'
+            };
+
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">';
+
+            Object.entries(days).forEach(([key, dayName]) => {
+                const dayData = businessHours[key];
+                const timeDisplay = dayData.closed ? '定休日' : `${dayData.start || '--:--'} 〜 ${dayData.end || '--:--'}`;
+
+                html += `
+                <div style="padding: 8px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef;">
+                    <div style="font-weight: 600; font-size: 0.9em; color: #495057;">${dayName}</div>
+                    <div style="font-size: 0.85em; color: ${dayData.closed ? '#dc3545' : '#6c757d'};">${timeDisplay}</div>
+                </div>`;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function generateHTMLContent(data) {
+            const basic = data.basicInfo;
+
+            let basicInfoHTML = `
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #495057; margin-bottom: 15px;">📋 基本設定</h3>
+                <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">`;
+
+            if (basic.projectName) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>店舗名:</strong> ${basic.projectName}</span><button onclick="copyText('${basic.projectName.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.accountName) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>Googleアカウント名:</strong> ${'*'.repeat(basic.accountName.length)}</span><button onclick="copyText('${basic.accountName.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.password) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>Googleアカウントパスワード:</strong> ${'*'.repeat(basic.password.length)}</span><button onclick="copyText('${basic.password.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.shareUrl) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>共有URL:</strong> ${basic.shareUrl}</span><button onclick="copyText('${basic.shareUrl.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.name) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>お名前入力欄:</strong> ${basic.name === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.name === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
+
+            if (basic.tel) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>電話番号入力欄:</strong> ${basic.tel === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.tel === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
+
+            if (basic.holiday) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>祝日営業:</strong> ${basic.holiday === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.holiday === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
+
+            if (basic.multiple) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>複数選択:</strong> ${basic.multiple === 'yes' ? '可能' : '不可'}</span><button onclick="copyText('${basic.multiple === 'yes' ? '可能' : '不可'}')">📋</button></div>`;
+
+            if (basic.interval) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>予約間隔:</strong> ${basic.interval}</span><button onclick="copyText('${basic.interval.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.frame) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>1コマの最大予約数:</strong> ${basic.frame}</span><button onclick="copyText('${basic.frame.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.user) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>1ユーザーの最大予約数:</strong> ${basic.user}</span><button onclick="copyText('${basic.user.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            // 営業時間セクション
+            basicInfoHTML += `
+            <div style="margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                <div style="font-weight: 600; margin-bottom: 8px;">営業時間</div>
+                ${generateBusinessHoursHTML(basic.businessHours)}
+            </div>`;
+
+            if (basic.multipletime) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>営業時間備考:</strong> ${basic.multipletime}</span><button onclick="copyText('${basic.multipletime.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.reservestart) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>予約受付開始時間:</strong> ${basic.reservestart}</span><button onclick="copyText('${basic.reservestart.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.reservelast) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>予約最終受付時間:</strong> ${basic.reservelast}</span><button onclick="copyText('${basic.reservelast.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            if (basic.reservelastover) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>最終受付時間超過:</strong> ${basic.reservelastover === 'yes' ? '可能' : '不可'}</span><button onclick="copyText('${basic.reservelastover === 'yes' ? '可能' : '不可'}')">📋</button></div>`;
+
+            if (basic.overview) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>備考・その他の設定:</strong> ${basic.overview}</span><button onclick="copyText('${basic.overview.replace(/'/g, "\\'")}')">📋</button></div>`;
+
+            basicInfoHTML += `</div></div>`;
+
+            let menusHTML = '';
+            if (data.menus.length > 0) {
+                menusHTML = `
+                <div>
+                    <h3 style="color: #495057; margin-bottom: 15px;">📝 カテゴリー詳細</h3>`;
+
+                data.menus.forEach(menu => {
+                menusHTML += `
+                <div style="background: white; border-radius: 12px; margin-bottom: 20px; overflow: hidden; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-weight: 600; font-size: 1.1em;">${menu.name}</div>
+                        <button onclick="copyText('${menu.name.replace(/'/g, "\\'")}')">📋</button>
+                    </div>`;
+
+                    if (menu.options.length > 0) {
+                        menusHTML += `
+                        <div style="padding: 20px;">
+                            <div style="font-weight: 600; color: #495057; margin-bottom: 15px; font-size: 1em;">🔹 メニュー項目</div>`;
+
+                        menu.options.forEach(option => {
+                            const optionName = typeof option === 'object' ? option.name : option;
+                            const optionTime = typeof option === 'object' ? option.time : 0;
+                            const timeDisplay = optionTime > 0 ? ` (${optionTime}分)` : '';
+                            
+                            menusHTML += `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+                                <span>${optionName}${timeDisplay}</span>
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="copyText('${optionName.replace(/'/g, "\\'")}')">📋名前</button>
+                                    ${optionTime > 0 ? `<button onclick="copyText('${optionTime}')">📋時間</button>` : ''}
+                                </div>
+                            </div>`;
+                        });
+
+                        menusHTML += `</div>`;
+                    }
+
+                    if (menu.suboptions.length > 0) {
+                        menusHTML += `
+                        <div style="padding: 20px;">
+                            <div style="font-weight: 600; color: #495057; margin-bottom: 15px; font-size: 1em;">🔸 オプション項目</div>`;
+
+                        menu.suboptions.forEach(suboption => {
+                            const suboptionName = typeof suboption === 'object' ? suboption.name : suboption;
+                            const suboptionTime = typeof suboption === 'object' ? suboption.time : 0;
+                            const timeDisplay = suboptionTime > 0 ? ` (${suboptionTime}分)` : '';
+                            
+                            menusHTML += `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+                                <span>${suboptionName}${timeDisplay}</span>
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="copyText('${suboptionName.replace(/'/g, "\\'")}')">📋名前</button>
+                                    ${suboptionTime > 0 ? `<button onclick="copyText('${suboptionTime}')">📋時間</button>` : ''}
+                                </div>
+                            </div>`;
+                        });
+
+                        menusHTML += `</div>`;
+                    }
+
+                    menusHTML += `</div>`;
+                });
+
+                menusHTML += `</div>`;
+            }
+
+            const title = data.basicInfo.projectName ? `${data.basicInfo.projectName} - ヒアリングシート` : 'ヒアリングシート';
+
+            return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .content {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideInRight 0.3s ease;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 ${title}</h1>
+            <p>階層型ヒアリングシート</p>
+        </div>
+        <div class="content">
+            ${basicInfoHTML}
+            ${menusHTML}
+        </div>
+    </div>
+    <script>
+        function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopyMessage('コピーしました！');
+                }).catch(err => {
+                    console.error('コピーに失敗しました:', err);
+                    fallbackCopyText(text);
+                });
+            } else {
+                fallbackCopyText(text);
+            }
+        }
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showCopyMessage('コピーしました！');
+            } catch (err) {
+                console.error('フォールバックコピーに失敗しました:', err);
+                showCopyMessage('コピーに失敗しました');
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function showCopyMessage(message) {
+            const existingMessage = document.querySelector('.copy-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'copy-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.style.animation = 'slideInRight 0.3s ease reverse';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            messageDiv.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+    <\/script>
+<\/body>
+<\/html>`;
+        }
+
+        function downloadHTML(content, filename) {
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // メモリリークを防ぐためにURLを解放
+            URL.revokeObjectURL(url);
+
+            showCopyMessage('HTMLファイルをダウンロードしました！');
+        }
+
+        function showCopyMessage(message) {
+            // 既存のメッセージがあれば削除
+            const existingMessage = document.querySelector('.copy-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'copy-message';
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideInRight 0.3s ease;
+            `;
+
+            // アニメーションのCSSを追加
+            if (!document.querySelector('#copyMessageStyle')) {
+                const style = document.createElement('style');
+                style.id = 'copyMessageStyle';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from {
+                            transform: translateX(100%);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(messageDiv);
+
+            // 3秒後に削除
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.style.animation = 'slideInRight 0.3s ease reverse';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            messageDiv.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // 1. メモリ内データ保存用変数を追加（スクリプトの最初に）
+        let savedFormData = {};
+        let currentProjectName = '';
+
+        // URLベースの永続化システム
+        function saveToURL() {
+            try {
+                if (Object.keys(savedFormData).length === 0) {
+                    // データが空の場合はハッシュを削除
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                    return;
+                }
+                
+                const dataString = JSON.stringify(savedFormData);
+                const compressed = btoa(encodeURIComponent(dataString));
+                const newUrl = window.location.pathname + window.location.search + '#data=' + compressed;
+                window.history.replaceState(null, '', newUrl);
+                console.log('URLに保存完了');
+            } catch (e) {
+                console.error('URL保存エラー:', e);
+                // フォールバックとしてlocalStorageを使用
+                try {
+                    localStorage.setItem('hearingSheetData', JSON.stringify(savedFormData));
+                    console.log('localStorageにフォールバック保存');
+                } catch (localError) {
+                    console.error('localStorage保存も失敗:', localError);
+                }
+            }
+        }
+
+        function loadFromURL() {
+            try {
+                const hash = window.location.hash;
+                if (hash.startsWith('#data=')) {
+                    const compressed = hash.substring(6);
+                    const decompressed = JSON.parse(decodeURIComponent(atob(compressed)));
+                    savedFormData = decompressed;
+                    console.log('URLからデータを復元しました');
+                    return true;
+                }
+            } catch (e) {
+                console.error('URL復元エラー:', e);
+            }
+            
+            // URLからの復元に失敗した場合、localStorageを試す
+            try {
+                const storedData = localStorage.getItem('hearingSheetData');
+                if (storedData) {
+                    savedFormData = JSON.parse(storedData);
+                    console.log('localStorageからデータを復元しました');
+                    // URLにも保存し直す
+                    saveToURL();
+                    return true;
+                }
+            } catch (e) {
+                console.error('localStorage復元エラー:', e);
+            }
+            
+            return false;
+        }
+
+        // 2. 自動保存機能を修正
+        function autoSave() {
+            const projectName = document.getElementById('projectName').value.trim();
+            if (projectName) {
+                try {
+                    const data = collectFormData();
+                    savedFormData[projectName] = JSON.parse(JSON.stringify(data));
+                    currentProjectName = projectName;
+                    saveToURL();
+                    console.log(`自動保存完了: ${projectName}`);
+                } catch (e) {
+                    console.error('自動保存エラー:', e);
+                }
+            }
+        }
+
+        function loadSavedData(projectName) {
+            try {
+                const savedData = savedFormData[projectName];
+                
+                if (savedData) {
+                    restoreFormData(savedData);
+                    currentProjectName = projectName;
+                    showCopyMessage(`${projectName}のデータを復元しました！`);
+                    return true;
+                }
+            } catch (e) {
+                console.error('データ復元エラー:', e);
+            }
+            return false;
+        }
+
+        // フォームデータ復元
+        function restoreFormData(data) {
+            const basic = data.basicInfo;
+            
+            // 基本情報復元
+            Object.keys(basic).forEach(key => {
+                if (key === 'businessHours') {
+                    Object.keys(basic.businessHours).forEach(day => {
+                        const dayData = basic.businessHours[day];
+                        const startEl = document.getElementById(`${day}_start`);
+                        const endEl = document.getElementById(`${day}_end`);
+                        const closedEl = document.getElementById(`${day}_closed`);
+                        
+                        if (startEl) startEl.value = dayData.start || '';
+                        if (endEl) endEl.value = dayData.end || '';
+                        if (closedEl) {
+                            closedEl.checked = dayData.closed;
+                            if (dayData.closed) toggleDayInputs(day);
+                        }
+                    });
+                } else if (['name', 'tel', 'holiday', 'multiple', 'reservelastover'].includes(key)) {
+                    const radio = document.querySelector(`input[name="${key}"][value="${basic[key]}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    const element = document.getElementById(key);
+                    if (element) element.value = basic[key] || '';
+                }
+            });
+
+            // メニューデータ復元
+            // 既存メニューをクリア
+            document.getElementById('menusContainer').innerHTML = '';
+            menuCount = 0;
+            optionCounters = {};
+            suboptionCounters = {};
+
+            // メニューデータが存在する場合のみ復元
+            if (data.menus && data.menus.length > 0) {
+                data.menus.forEach(menu => {
+                    addMenu();
+                    const currentMenuId = menuCount;
+                    
+                    // メニュー名設定
+                    const menuInput = document.querySelector(`input[name="menu-${currentMenuId}"]`);
+                    if (menuInput) menuInput.value = menu.name;
+                    
+                    // オプション復元
+                    if (menu.options && menu.options.length > 0) {
+                        menu.options.forEach(option => {
+                            addOption(currentMenuId);
+                            const optionId = optionCounters[currentMenuId];
+                            const optionInput = document.querySelector(`input[name="option-${currentMenuId}-${optionId}"]`);
+                            const timeInput = document.querySelector(`input[name="option-time-${currentMenuId}-${optionId}"]`);
+                            
+                            if (optionInput) optionInput.value = option.name || '';
+                            if (timeInput && option.time) timeInput.value = option.time;
+                        });
+                    }
+                    
+                    // サブオプション復元
+                    if (menu.suboptions && menu.suboptions.length > 0) {
+                        menu.suboptions.forEach(suboption => {
+                            addSuboption(currentMenuId);
+                            const suboptionId = suboptionCounters[currentMenuId];
+                            const suboptionInput = document.querySelector(`input[name="suboption-${currentMenuId}-${suboptionId}"]`);
+                            const timeInput = document.querySelector(`input[name="suboption-time-${currentMenuId}-${suboptionId}"]`);
+                            
+                            if (suboptionInput) suboptionInput.value = suboption.name || '';
+                            if (timeInput && suboption.time) timeInput.value = suboption.time;
+                        });
+                    }
+                });
+            } else {
+                // メニューデータがない場合はデフォルトで1つ追加
+                addMenu();
+            }
+        }
+
+        // 店舗名入力時の処理
+        function handleProjectNameChange() {
+            const projectName = document.getElementById('projectName').value.trim();
+            if (projectName && savedFormData[projectName]) {
+                setTimeout(() => {
+                    if (loadSavedData(projectName)) {
+                        console.log(`${projectName}のデータを復元しました`);
+                    }
+                }, 100);
+            } else if (projectName) {
+                currentProjectName = projectName;
+                autoSave(); // 新しいプロジェクト名での保存を開始
+            }
+        }
+
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function () {
+            // URLからデータを復元
+            loadFromURL();
+            
+            // デフォルトでカテゴリーを1つ追加
+            addMenu();
+            
+            // 店舗名フィールドにイベントリスナー追加
+            const projectNameInput = document.getElementById('projectName');
+            if (projectNameInput) {
+                projectNameInput.addEventListener('blur', handleProjectNameChange);
+                projectNameInput.addEventListener('change', handleProjectNameChange);
+            }
+            
+            // 全入力フィールドに自動保存イベント追加
+            document.addEventListener('input', debounce(autoSave, 1000));
+            document.addEventListener('change', autoSave);
+            
+            // ページ離脱前に保存
+            window.addEventListener('beforeunload', function() {
+                if (currentProjectName) {
+                    autoSave();
+                }
+            });
+        });
+
+        // データ削除機能を修正
+        function clearSavedData(projectName) {
+            if (confirm(`${projectName}の保存データを削除しますか？`)) {
+                try {
+                    delete savedFormData[projectName];
+                    if (currentProjectName === projectName) {
+                        currentProjectName = '';
+                    }
+                    saveToURL();
+                    showCopyMessage(`${projectName}のデータを削除しました`);
+                } catch (e) {
+                    console.error('データ削除エラー:', e);
+                }
+            }
+        }
+
+        // 全データ削除機能を修正
+        function clearAllSavedData() {
+            if (confirm('すべての保存データを削除しますか？この操作は取り消せません。')) {
+                try {
+                    savedFormData = {};
+                    currentProjectName = '';
+                    // URLハッシュとlocalStorageの両方をクリア
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                    localStorage.removeItem('hearingSheetData');
+                    showCopyMessage('すべてのデータを削除しました');
+                } catch (e) {
+                    console.error('全データ削除エラー:', e);
+                }
+            }
+        }
+
+        // 保存データ一覧表示機能
+        function showSavedDataList() {
+            const projectNames = Object.keys(savedFormData);
+            if (projectNames.length === 0) {
+                alert('保存されたデータがありません');
+                return;
+            }
+            
+            let message = '保存されているプロジェクト:\n\n';
+            projectNames.forEach((name, index) => {
+                message += `${index + 1}. ${name}\n`;
+            });
+            
+            alert(message);
+        }
+
+        // デバウンス関数（連続入力時の保存頻度制御）
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // 8. 手動保存・復元機能を追加
+        function manualSave() {
+            const projectName = document.getElementById('projectName').value.trim();
+            if (!projectName) {
+                alert('店舗名を入力してください');
+                return;
+            }
+            autoSave();
+            showCopyMessage('手動保存完了！');
+        }
+
+        function showProjectList() {
+            const projectNames = Object.keys(savedFormData);
+            if (projectNames.length === 0) {
+                alert('保存されたプロジェクトがありません');
+                return;
+            }
+            
+            let message = '保存されているプロジェクト:\n\n';
+            projectNames.forEach((name, index) => {
+                const current = name === currentProjectName ? ' (現在)' : '';
+                message += `${index + 1}. ${name}${current}\n`;
+            });
+            
+            alert(message);
+        }
+    </script>
+</body>
+
+</html>
