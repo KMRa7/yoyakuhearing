@@ -1871,6 +1871,46 @@
             
             alert(message);
         }
+
+        function clearFormData() {
+            // 基本情報をクリア
+            const formElements = ['accountName', 'password', 'shareUrl', 'interval', 'frame', 'user', 'multipletime', 'reservestart', 'reservelast', 'overview'];
+            formElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+            
+            // ラジオボタンをクリア
+            const radioNames = ['name', 'tel', 'holiday', 'multiple', 'reservelastover'];
+            radioNames.forEach(name => {
+                const radios = document.querySelectorAll(`input[name="${name}"]`);
+                radios.forEach(radio => radio.checked = false);
+            });
+            
+            // 営業時間をクリア
+            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            days.forEach(day => {
+                const startEl = document.getElementById(`${day}_start`);
+                const endEl = document.getElementById(`${day}_end`);
+                const closedEl = document.getElementById(`${day}_closed`);
+                
+                if (startEl) startEl.value = '';
+                if (endEl) endEl.value = '';
+                if (closedEl) {
+                    closedEl.checked = false;
+                    toggleDayInputs(day); // 入力欄を有効化
+                }
+            });
+            
+            // メニューデータをクリア
+            document.getElementById('menusContainer').innerHTML = '';
+            menuCount = 0;
+            optionCounters = {};
+            suboptionCounters = {};
+            
+            // デフォルトでカテゴリーを1つ追加
+            addMenu();
+        }
     </script>
 </body>
 
