@@ -1727,7 +1727,7 @@
         // 店舗名入力時の処理
         function handleProjectNameChange() {
             const projectName = document.getElementById('projectName').value.trim();
-            if (projectName && savedFormData[projectName]) {
+            if (projectName && savedFormData[projectName] && projectName !== currentProjectName) {
                 setTimeout(() => {
                     if (loadSavedData(projectName)) {
                         console.log(`${projectName}のデータを復元しました`);
