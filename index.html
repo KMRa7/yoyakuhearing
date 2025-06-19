@@ -1279,7 +1279,7 @@
                                 <span>${optionName}${timeDisplay}</span>
                                 <div style="display: flex; gap: 5px;">
                                     <button onclick="copyText('${optionName.replace(/'/g, "\\'")}')">📋名前</button>
-                                    ${optionTime > 0 ? `<button onclick="copyText('${optionTime}')">📋時間</button>` : ''}
+                                    <button onclick="copyText('${optionTime}')">📋時間</button>
                                 </div>
                             </div>`;
                         });
@@ -1302,7 +1302,7 @@
                                 <span>${suboptionName}${timeDisplay}</span>
                                 <div style="display: flex; gap: 5px;">
                                     <button onclick="copyText('${suboptionName.replace(/'/g, "\\'")}')">📋名前</button>
-                                    ${suboptionTime > 0 ? `<button onclick="copyText('${suboptionTime}')">📋時間</button>` : ''}
+                                    <button onclick="copyText('${suboptionTime}')">📋時間</button>
                                 </div>
                             </div>`;
                         });
