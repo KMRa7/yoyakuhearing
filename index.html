@@ -1209,6 +1209,8 @@
 
             if (basic.projectName) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>店舗名:</strong> ${basic.projectName}</span><button onclick="copyText('${basic.projectName.replace(/'/g, "\\'")}')">📋</button></div>`;
 
+            if (basic.Developer) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>LINEDeveloperの権限の確認はしましたか？:</strong> ${basic.Developer === 'yes' ? 'はい' : 'いいえ'}</span><button onclick="copyText('${basic.Developer === 'yes' ? 'はい' : 'いいえ'}')">📋</button></div>`;
+            
             if (basic.accountName) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>Googleアカウント名:</strong> ${'*'.repeat(basic.accountName.length)}</span><button onclick="copyText('${basic.accountName.replace(/'/g, "\\'")}')">📋</button></div>`;
 
             if (basic.password) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>Googleアカウントパスワード:</strong> ${'*'.repeat(basic.password.length)}</span><button onclick="copyText('${basic.password.replace(/'/g, "\\'")}')">📋</button></div>`;
@@ -1218,8 +1220,6 @@
             if (basic.name) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>お名前入力欄:</strong> ${basic.name === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.name === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
 
             if (basic.tel) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>電話番号入力欄:</strong> ${basic.tel === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.tel === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
-
-            if (basic.Developer) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>祝日営業:</strong> ${basic.Developer === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.Developer === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
 
             if (basic.holiday) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>祝日営業:</strong> ${basic.holiday === 'yes' ? 'あり' : 'なし'}</span><button onclick="copyText('${basic.holiday === 'yes' ? 'あり' : 'なし'}')">📋</button></div>`;
 
