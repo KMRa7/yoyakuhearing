@@ -603,17 +603,31 @@
                     </div>
 
                     <div class="form-group">
-                        <label>メニューを複数選択したいですか？</label>
-                        <div style="margin-top: 8px;">
-                            <label style="margin-right: 20px;">
-                                <input type="radio" name="multiple" value="yes" style="margin-right: 5px;">
-                                はい
-                            </label>
-                            <label>
-                                <input type="radio" name="multiple" value="no" style="margin-right: 5px;">
-                                いいえ
-                            </label>
-                        </div>
+                      <label>メニューは複数選択しますか？</label>
+                      <div style="margin-top: 8px;">
+                        <label style="margin-right: 20px;">
+                          <input type="radio" name="multiple" value="yes" style="margin-right: 5px;">
+                          はい
+                        </label>
+                        <label>
+                          <input type="radio" name="multiple" value="no" style="margin-right: 5px;">
+                          いいえ
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label>オプションは複数選択しますか？</label>
+                      <div style="margin-top: 8px;">
+                        <label style="margin-right: 20px;">
+                          <input type="radio" name="optionMultiple" value="yes" style="margin-right: 5px;">
+                          はい
+                        </label>
+                        <label>
+                          <input type="radio" name="optionMultiple" value="no" style="margin-right: 5px;">
+                          いいえ
+                        </label>
+                      </div>
                     </div>
 
                     <div class="form-group">
@@ -1099,6 +1113,7 @@
                     reservestart: document.getElementById('reservestart').value,
                     reservelast: document.getElementById('reservelast').value,
                     reservelastover: getRadioValue('reservelastover'),
+                    optionMultiple: getRadioValue('optionMultiple'),
                     overview: document.getElementById('overview').value
                 },
                 menus: []
@@ -1225,6 +1240,8 @@
 
             if (basic.multiple) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>メニュー複数選択:</strong> ${basic.multiple === 'yes' ? '可能' : '不可'}</span><button onclick="copyText('${basic.multiple === 'yes' ? '可能' : '不可'}')">📋</button></div>`;
 
+            if (basic.optionMultiple) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>オプション複数選択:</strong> ${basic.optionMultiple === 'yes' ? '可能' : '不可'}</span><button onclick="copyText('${basic.optionMultiple === 'yes' ? '可能' : '不可'}')">📋</button></div>`;
+            
             if (basic.interval) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>予約間隔:</strong> ${basic.interval}</span><button onclick="copyText('${basic.interval.replace(/'/g, "\\'")}')">📋</button></div>`;
 
             if (basic.frame) basicInfoHTML += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f8f9fa; border-radius: 4px;"><span><strong>1コマの最大予約数:</strong> ${basic.frame}</span><button onclick="copyText('${basic.frame.replace(/'/g, "\\'")}')">📋</button></div>`;
@@ -1690,7 +1707,7 @@
                             if (dayData.closed) toggleDayInputs(day);
                         }
                     });
-                } else if (['Developer', 'name', 'tel', 'holiday', 'multiple', 'reservelastover'].includes(key)) {
+                } else if (['Developer', 'name', 'tel', 'holiday', 'multiple', 'reservelastover', 'optionMultiple'].includes(key)) {
                     const radio = document.querySelector(`input[name="${key}"][value="${basic[key]}"]`);
                     if (radio) radio.checked = true;
                 } else {
@@ -1905,7 +1922,7 @@
             });
             
             // ラジオボタンをクリア
-            const radioNames = ['Developer', 'name', 'tel', 'holiday', 'multiple', 'reservelastover'];
+            const radioNames = ['Developer', 'name', 'tel', 'holiday', 'multiple', 'reservelastover', 'optionMultiple'];
             radioNames.forEach(name => {
                 const radios = document.querySelectorAll(`input[name="${name}"]`);
                 radios.forEach(radio => radio.checked = false);
