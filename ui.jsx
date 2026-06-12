@@ -2,7 +2,7 @@
 const { useState, useEffect, useRef } = React;
 
 /* ---- icons ---- */
-function Icon({ name, className }) {
+function Icon({ name, className, style }) {
   const paths = {
     plus: "M10 4v12M4 10h12",
     trash: "M3 5h14M8 5V3.5A1.5 1.5 0 0 1 9.5 2h1A1.5 1.5 0 0 1 12 3.5V5m2 0v10a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 6 15V5",
@@ -17,7 +17,9 @@ function Icon({ name, className }) {
     folder: "M3 5.5A1.5 1.5 0 0 1 4.5 4h3l1.5 2h6.5A1.5 1.5 0 0 1 17 7.5v7A1.5 1.5 0 0 1 15.5 16h-11A1.5 1.5 0 0 1 3 14.5v-9Z",
   };
   return (
-    <svg className={className} viewBox="0 0 20 20" fill="none"
+    <svg className={className}
+      style={{ width: 16, height: 16, flexShrink: 0, display: "inline-block", verticalAlign: "middle", ...style }}
+      viewBox="0 0 20 20" fill="none"
       stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d={paths[name]} />
     </svg>

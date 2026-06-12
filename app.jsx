@@ -96,6 +96,20 @@ function SavedMenu({ onLoad, onToast }) {
   );
 }
 
+/* ====== Reference image with graceful fallback ====== */
+function RefImage({ src, label }) {
+  const [err, setErr] = useState(false);
+  if (err) {
+    return (
+      <div className="ref-ph">
+        <span>{label}</span>
+        <em>画像を表示できません</em>
+      </div>
+    );
+  }
+  return <img loading="lazy" alt={label} src={src} onError={() => setErr(true)} />;
+}
+
 /* ====== Preview modal ====== */
 function PreviewModal({ html, onClose, onDownload }) {
   useEffect(() => {
@@ -314,9 +328,9 @@ function App() {
               </button>
               {refOpen && (
                 <div className="ref-grid">
-                  <img loading="lazy" alt="予約フォーム イメージ1" src="https://www.dropbox.com/scl/fi/a3hyjyfcypkd1apa0jqpf/2025-06-16-17.32.40.png?rlkey=rpcmsxdajmy1y2mypcbg3hhfw&st=b1fvoryu&dl=1" />
-                  <img loading="lazy" alt="予約フォーム イメージ2" src="https://www.dropbox.com/scl/fi/dexuzjkce1yt89xa0z632/2025-06-16-17.33.08.png?rlkey=8a01k705vxy8abbe5swqsjp9p&st=ckazl25l&dl=1" />
-                  <img loading="lazy" alt="予約フォーム イメージ3" src="https://www.dropbox.com/scl/fi/dd8v5l3s30awac0p73aeh/2025-06-16-17.33.34.png?rlkey=qbtx2xyvl1v6kd0w8lwylxvpz&st=d35bavf1&dl=1" />
+                  <RefImage label="予約フォーム イメージ 1" src="https://www.dropbox.com/scl/fi/a3hyjyfcypkd1apa0jqpf/2025-06-16-17.32.40.png?rlkey=rpcmsxdajmy1y2mypcbg3hhfw&raw=1" />
+                  <RefImage label="予約フォーム イメージ 2" src="https://www.dropbox.com/scl/fi/dexuzjkce1yt89xa0z632/2025-06-16-17.33.08.png?rlkey=8a01k705vxy8abbe5swqsjp9p&raw=1" />
+                  <RefImage label="予約フォーム イメージ 3" src="https://www.dropbox.com/scl/fi/dd8v5l3s30awac0p73aeh/2025-06-16-17.33.34.png?rlkey=qbtx2xyvl1v6kd0w8lwylxvpz&raw=1" />
                 </div>
               )}
             </div>

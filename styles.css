@@ -410,7 +410,7 @@ input, select, textarea { font-family: inherit; color: var(--ink); }
   background: var(--accent); color: #fff;
   display: grid; place-items: center; font-weight: 700; font-size: 13px;
 }
-.cat-name { flex: 1; }
+.cat-name { flex: 1; min-width: 0; }
 .cat-name input {
   width: 100%; height: 40px; padding: 0 12px;
   border: 1px solid var(--border-strong); border-radius: 8px;
@@ -420,7 +420,7 @@ input, select, textarea { font-family: inherit; color: var(--ink); }
 .cat-name input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
 .cat-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-.cat-col { padding: 16px; }
+.cat-col { padding: 16px; min-width: 0; }
 .cat-col + .cat-col { border-left: 1px solid var(--border); }
 .cat-col-head {
   display: flex; align-items: center; gap: 8px;
@@ -433,10 +433,11 @@ input, select, textarea { font-family: inherit; color: var(--ink); }
 
 .item-rows { display: flex; flex-direction: column; gap: 7px; }
 .item-row {
-  display: grid; grid-template-columns: 1fr 92px auto; gap: 8px; align-items: center;
+  display: grid; grid-template-columns: minmax(0, 1fr) 84px 34px; gap: 8px; align-items: center;
+  min-width: 0;
 }
 .item-row input[type="text"] {
-  height: 38px; padding: 0 11px;
+  height: 38px; padding: 0 11px; min-width: 0;
   border: 1px solid var(--border-strong); border-radius: 7px;
   font-size: 13.5px; background: var(--surface); width: 100%;
   transition: border-color .15s, box-shadow .15s;
@@ -509,7 +510,16 @@ input, select, textarea { font-family: inherit; color: var(--ink); }
 .ref-toggle .chev { margin-left: auto; transition: transform .2s; color: var(--faint); }
 .ref-toggle.open .chev { transform: rotate(180deg); }
 .ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; }
-.ref-grid img { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-3); }
+.ref-grid img { width: 100%; display: block; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-3); }
+.ref-ph {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 150px; padding: 20px; text-align: center;
+  border: 1px solid var(--border); border-radius: 10px;
+  background-color: var(--surface-3);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 9px, oklch(0.93 0.006 250) 9px, oklch(0.93 0.006 250) 10px);
+}
+.ref-ph span { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.ref-ph em { font-style: normal; font-size: 11px; color: var(--muted); font-family: ui-monospace, monospace; }
 
 /* =================== toast =================== */
 
