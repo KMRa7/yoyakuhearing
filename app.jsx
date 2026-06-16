@@ -39,6 +39,25 @@ function computeDone(s) {
   };
 }
 
+/* フォームが（店舗名を除いて）空かどうか */
+function isFormBlank(s) {
+  const keys = ["developer", "googleAccount", "googlePassword", "shareUrl",
+    "fieldName", "fieldTel", "menuMultiple", "optionMultiple", "holiday",
+    "multipleTimeNote", "interval", "frameMax", "userMax",
+    "reserveStart", "reserveLast", "reserveLastOver", "note"];
+  if (keys.some((k) => (s[k] ?? "") !== "")) return false;
+  const hoursBlank = Object.values(s.hours).every((h) => !h.start && !h.end && !h.closed);
+  if (!hoursBlank) return false;
+  const catsBlank = (s.categories || []).every((c) => !c.name.trim() && c.menus.length === 0 && c.options.length === 0);
+  if (!catsBlank) return false;
+  return true;
+}
+
+function readSheets() {
+  try { return JSON.parse(localStorage.getItem(SHEETS_KEY) || "{}"); }
+  catch (_) { return {}; }
+}
+
 /* ====== Saved sheets dropdown ====== */
 function SavedMenu({ onLoad, onToast }) {
   const [open, setOpen] = useState(false);
@@ -79,7 +98,7 @@ function SavedMenu({ onLoad, onToast }) {
               <div className="dd-head">保存済みシート（{names.length}）</div>
               {names.map((name) => (
                 <div className="dd-item" key={name}
-                  onClick={() => { onLoad(sheets[name].data); setOpen(false); }}>
+                  onClick={() => { onLoad(sheets[name].data, sheets[name].updatedAt); setOpen(false); }}>
                   <Icon name="folder" className="ic" style={{ width: 15, height: 15, color: "var(--faint)" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="dd-item-name">{name}</div>
@@ -166,22 +185,16 @@ function PreviewModal({ html, onClose, onDownload }) {
 
 /* ====== App ====== */
 function App() {
-  const [s, setS] = useState(() => {
-    try {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) return { ...initialState(), ...JSON.parse(saved) };
-    } catch (_) {}
-    return initialState();
-  });
+  const [s, setS] = useState(() => initialState());
   const [savedAt, setSavedAt] = useState(null);
+  const [dirty, setDirty] = useState(false);
   const [active, setActive] = useState("sec-basic");
   const [toasts, setToasts] = useState([]);
   const [refOpen, setRefOpen] = useState(false);
   const [preview, setPreview] = useState(null);
   const [confirm, setConfirm] = useState(null);
-  const first = useRef(true);
 
-  const set = (key, val) => setS((p) => ({ ...p, [key]: val }));
+  const set = (key, val) => { setS((p) => ({ ...p, [key]: val })); setDirty(true); };
 
   const toast = (msg) => {
     const id = Math.random().toString(36).slice(2);
@@ -189,14 +202,20 @@ function App() {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 2200);
   };
 
-  /* autosave draft */
+  /* 店舗名を入力すると、保存済みシートを自動復元（フォームが空のときのみ） */
   useEffect(() => {
-    if (first.current) { first.current = false; return; }
-    const t = setTimeout(() => {
-      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(s)); setSavedAt(Date.now()); } catch (_) {}
-    }, 500);
-    return () => clearTimeout(t);
-  }, [s]);
+    const name = s.storeName.trim();
+    if (!name) return;
+    if (!isFormBlank(s)) return;
+    const sheets = readSheets();
+    if (sheets[name]) {
+      setS({ ...initialState(), ...sheets[name].data });
+      setSavedAt(sheets[name].updatedAt || Date.now());
+      setDirty(false);
+      toast(`「${name}」の保存内容を復元しました`);
+    }
+    // eslint-disable-next-line
+  }, [s.storeName]);
 
   /* active section on scroll */
   useEffect(() => {
@@ -220,14 +239,17 @@ function App() {
   const saveNamed = () => {
     const name = s.storeName.trim();
     if (!name) { toast("店舗名を入力してから保存してください"); return; }
-    let sheets = {};
-    try { sheets = JSON.parse(localStorage.getItem(SHEETS_KEY) || "{}"); } catch (_) { sheets = {}; }
+    const sheets = readSheets();
     const exists = !!sheets[name];
     const write = () => {
       const next = { ...sheets, [name]: { data: s, updatedAt: Date.now() } };
       try {
         localStorage.setItem(SHEETS_KEY, JSON.stringify(next));
-        toast(exists ? `「${name}」を上書き保存しました` : `「${name}」を保存しました`);
+        toast(`「${name}」を保存しました（入力欄をクリアしました）`);
+        setS(initialState());
+        setSavedAt(null);
+        setDirty(false);
+        window.scrollTo({ top: 0 });
       } catch (err) {
         toast("保存に失敗しました（容量超過の可能性）");
       }
@@ -235,7 +257,7 @@ function App() {
     if (exists) {
       setConfirm({
         title: "上書き保存しますか？",
-        message: `同じ名前のシート「${name}」がすでにあります。現在の内容で上書き保存します。`,
+        message: `同じ名前のシート「${name}」がすでに保存されています。現在の内容で上書きします。`,
         confirmLabel: "上書き保存", icon: "save",
         onConfirm: () => { write(); setConfirm(null); },
       });
@@ -250,10 +272,9 @@ function App() {
       message: "現在フォームに入力中の内容がすべて消去され、空の状態に戻ります。保存済みのシートは消えません。この操作は取り消せません。",
       confirmLabel: "リセットする", danger: true, icon: "reset",
       onConfirm: () => {
-        const fresh = initialState();
-        setS(fresh);
-        try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+        setS(initialState());
         setSavedAt(null);
+        setDirty(false);
         setConfirm(null);
         toast("入力内容をリセットしました");
         window.scrollTo({ top: 0 });
@@ -261,8 +282,10 @@ function App() {
     });
   };
 
-  const loadSheet = (data) => {
+  const loadSheet = (data, updatedAt) => {
     setS({ ...initialState(), ...data });
+    setSavedAt(updatedAt || Date.now());
+    setDirty(false);
     toast("シートを読み込みました");
     window.scrollTo({ top: 0 });
   };
@@ -287,8 +310,8 @@ function App() {
         </div>
         <div className="topbar-actions">
           <div className="save-status">
-            <span className={"save-dot" + (savedAt ? "" : " saving")} />
-            <span>{savedAt ? `自動保存済み ${new Date(savedAt).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}` : "自動保存"}</span>
+            <span className={"save-dot " + (dirty ? "saving" : savedAt ? "" : "neutral")} />
+            <span>{dirty ? "未保存の変更" : savedAt ? `保存済み ${new Date(savedAt).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}` : "新規作成"}</span>
           </div>
           <SavedMenu onLoad={loadSheet} onToast={toast} />
           <button className="btn" onClick={resetAll}><Icon name="reset" className="ic" />リセット</button>
@@ -323,7 +346,7 @@ function App() {
         <main className="content">
           <div className="intro">
             <h1>予約システム ヒアリングシート</h1>
-            <p>導入時のヒアリング内容を入力してください。入力は<b>自動保存</b>され、完了後は「HTML出力」で共有用シートを作成できます。時間はプルダウン選択式なので入力ミスが起きません。</p>
+            <p>導入時のヒアリング内容を入力してください。「保存」で<b>店舗名ごとに保存</b>でき、次回は店舗名を入力すると保存済みの内容を呼び出せます。完了後は「HTML出力」で共有用シートを作成できます。時間はプルダウン選択式なので入力ミスが起きません。</p>
           </div>
 
           <Section id="sec-basic" num="1" title="基本情報" desc="アカウント・連携の確認">

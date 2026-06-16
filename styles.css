@@ -127,6 +127,7 @@ input, select, textarea { font-family: inherit; color: var(--ink); }
 }
 .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px oklch(0.58 0.1 200 / 0.16); }
 .save-dot.saving { background: var(--warn-ink); box-shadow: 0 0 0 3px oklch(0.52 0.14 25 / 0.14); }
+.save-dot.neutral { background: var(--faint); box-shadow: 0 0 0 3px oklch(0.68 0.012 255 / 0.16); }
 
 /* buttons */
 .btn {
