@@ -110,6 +110,36 @@ function RefImage({ src, label }) {
   return <img loading="lazy" alt={label} src={src} onError={() => setErr(true)} />;
 }
 
+/* ====== Confirm dialog ====== */
+function ConfirmDialog({ open, title, message, confirmLabel, cancelLabel, danger, icon, onConfirm, onCancel }) {
+  useEffect(() => {
+    if (!open) return;
+    const k = (e) => { if (e.key === "Escape") onCancel(); };
+    document.addEventListener("keydown", k);
+    return () => document.removeEventListener("keydown", k);
+  }, [open]);
+  if (!open) return null;
+  return (
+    <div className="confirm-back" onMouseDown={onCancel}>
+      <div className="confirm" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="confirm-body">
+          <div className={"confirm-ic" + (danger ? " danger" : "")}>
+            <Icon name={icon || (danger ? "alert" : "save")} style={{ width: 21, height: 21 }} />
+          </div>
+          <div className="confirm-text">
+            <h3>{title}</h3>
+            <p>{message}</p>
+          </div>
+        </div>
+        <div className="confirm-foot">
+          <button className="btn btn-ghost" onClick={onCancel}>{cancelLabel || "キャンセル"}</button>
+          <button className={"btn " + (danger ? "btn-danger" : "btn-primary")} onClick={onConfirm}>{confirmLabel || "OK"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ====== Preview modal ====== */
 function PreviewModal({ html, onClose, onDownload }) {
   useEffect(() => {
@@ -148,6 +178,7 @@ function App() {
   const [toasts, setToasts] = useState([]);
   const [refOpen, setRefOpen] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [confirm, setConfirm] = useState(null);
   const first = useRef(true);
 
   const set = (key, val) => setS((p) => ({ ...p, [key]: val }));
@@ -188,12 +219,46 @@ function App() {
 
   const saveNamed = () => {
     const name = s.storeName.trim();
-    if (!name) { toast("店舗名を入力してください"); return; }
+    if (!name) { toast("店舗名を入力してから保存してください"); return; }
     let sheets = {};
-    try { sheets = JSON.parse(localStorage.getItem(SHEETS_KEY) || "{}"); } catch (_) {}
-    sheets[name] = { data: s, updatedAt: Date.now() };
-    localStorage.setItem(SHEETS_KEY, JSON.stringify(sheets));
-    toast(`「${name}」を保存しました`);
+    try { sheets = JSON.parse(localStorage.getItem(SHEETS_KEY) || "{}"); } catch (_) { sheets = {}; }
+    const exists = !!sheets[name];
+    const write = () => {
+      const next = { ...sheets, [name]: { data: s, updatedAt: Date.now() } };
+      try {
+        localStorage.setItem(SHEETS_KEY, JSON.stringify(next));
+        toast(exists ? `「${name}」を上書き保存しました` : `「${name}」を保存しました`);
+      } catch (err) {
+        toast("保存に失敗しました（容量超過の可能性）");
+      }
+    };
+    if (exists) {
+      setConfirm({
+        title: "上書き保存しますか？",
+        message: `同じ名前のシート「${name}」がすでにあります。現在の内容で上書き保存します。`,
+        confirmLabel: "上書き保存", icon: "save",
+        onConfirm: () => { write(); setConfirm(null); },
+      });
+    } else {
+      write();
+    }
+  };
+
+  const resetAll = () => {
+    setConfirm({
+      title: "入力内容をリセットしますか？",
+      message: "現在フォームに入力中の内容がすべて消去され、空の状態に戻ります。保存済みのシートは消えません。この操作は取り消せません。",
+      confirmLabel: "リセットする", danger: true, icon: "reset",
+      onConfirm: () => {
+        const fresh = initialState();
+        setS(fresh);
+        try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+        setSavedAt(null);
+        setConfirm(null);
+        toast("入力内容をリセットしました");
+        window.scrollTo({ top: 0 });
+      },
+    });
   };
 
   const loadSheet = (data) => {
@@ -226,6 +291,7 @@ function App() {
             <span>{savedAt ? `自動保存済み ${new Date(savedAt).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })}` : "自動保存"}</span>
           </div>
           <SavedMenu onLoad={loadSheet} onToast={toast} />
+          <button className="btn" onClick={resetAll}><Icon name="reset" className="ic" />リセット</button>
           <button className="btn" onClick={saveNamed}><Icon name="save" className="ic" />保存</button>
           <button className="btn" onClick={openPreview}><Icon name="eye" className="ic" />プレビュー</button>
           <button className="btn btn-primary" onClick={() => downloadSheet(s)}><Icon name="download" className="ic" />HTML出力</button>
@@ -354,6 +420,9 @@ function App() {
         <PreviewModal html={preview} onClose={() => setPreview(null)}
           onDownload={() => { downloadSheet(s); setPreview(null); }} />
       )}
+
+      <ConfirmDialog open={!!confirm} {...(confirm || {})}
+        onCancel={() => setConfirm(null)} />
     </div>
   );
 }

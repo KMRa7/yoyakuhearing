@@ -15,6 +15,8 @@ function Icon({ name, className, style }) {
     check: "M4 10.5 8 14.5 16 5.5",
     clock: "M10 5v5l3.2 1.8M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
     folder: "M3 5.5A1.5 1.5 0 0 1 4.5 4h3l1.5 2h6.5A1.5 1.5 0 0 1 17 7.5v7A1.5 1.5 0 0 1 15.5 16h-11A1.5 1.5 0 0 1 3 14.5v-9Z",
+    alert: "M10 7v4m0 3h.01M10 2.5 18 16.5H2L10 2.5Z",
+    reset: "M3.5 9a6.5 6.5 0 1 1 1.2 4.7M3.5 5v4h4",
   };
   return (
     <svg className={className}
