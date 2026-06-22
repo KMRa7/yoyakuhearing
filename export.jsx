@@ -37,6 +37,7 @@ function generateSheetHTML(d) {
     row("電話番号入力欄", YESNO(d.fieldTel), false),
     row("メニューの複数選択", YESNO(d.menuMultiple), false),
     row("オプションの複数選択", YESNO(d.optionMultiple), false),
+    row("リマインドメッセージの利用", YESNO(d.reminder), false),
   ].join("");
 
   const hoursRows = DAYS.map(([k, label]) => {

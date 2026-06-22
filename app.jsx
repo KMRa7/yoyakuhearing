@@ -11,7 +11,7 @@ const emptyHours = () => {
 
 const initialState = () => ({
   storeName: "", developer: "", googleAccount: "", googlePassword: "", shareUrl: "",
-  fieldName: "", fieldTel: "", menuMultiple: "", optionMultiple: "",
+  fieldName: "", fieldTel: "", menuMultiple: "", optionMultiple: "", reminder: "",
   holiday: "", hours: emptyHours(), multipleTimeNote: "",
   interval: "", frameMax: "", userMax: "",
   reserveStart: "", reserveLast: "", reserveLastOver: "", note: "",
@@ -365,6 +365,7 @@ function App() {
               <Field label="電話番号の入力欄を設定する"><YesNo value={s.fieldTel} onChange={(v) => set("fieldTel", v)} /></Field>
               <Field label="メニューを複数選択できるようにする"><YesNo value={s.menuMultiple} onChange={(v) => set("menuMultiple", v)} /></Field>
               <Field label="オプションを複数選択できるようにする"><YesNo value={s.optionMultiple} onChange={(v) => set("optionMultiple", v)} /></Field>
+              <Field label="リマインドメッセージを利用する" span hint="予約日の前日などにお客様へ自動でリマインドを送信しますか。"><YesNo value={s.reminder} onChange={(v) => set("reminder", v)} /></Field>
             </div>
           </Section>
 
